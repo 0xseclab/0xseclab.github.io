@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows | 0xseclab</title><link>http://localhost:1313/tag/windows/</link><atom:link href="http://localhost:1313/tag/windows/index.xml" rel="self" type="application/rss+xml"/><description>Windows</description><generator>Hugo Blox Builder (https://hugoblox.com)</generator><language>en-us</language><lastBuildDate>Sat, 10 May 2025 00:00:00 +0000</lastBuildDate><image><url>http://localhost:1313/media/icon_hu10549305016715957011.png</url><title>Windows</title><link>http://localhost:1313/tag/windows/</link></image><item><title>Vintage</title><link>http://localhost:1313/blog/vintage-htb/</link><pubDate>Sat, 10 May 2025 00:00:00 +0000</pubDate><guid>http://localhost:1313/blog/vintage-htb/</guid><description>&lt;div style="text-align: center; font-size: 2em; font-weight: bold; color: MediumSpringGreen;">
 VINTAGE-HTB-ACTIVE DIRECTORY
 &lt;/div>
-&lt;p>
-&lt;figure >
-&lt;div class="flex justify-center ">
-&lt;div class="w-100" >&lt;img src="./Vintage.png" alt="" loading="lazy" data-zoomable />&lt;/div>
-&lt;/div>&lt;/figure>
-&lt;/p>
 &lt;h2 id="1-nmap-scan">1. &lt;strong>NMAP-SCAN&lt;/strong>:&lt;/h2>
 &lt;p>
 &lt;figure >
